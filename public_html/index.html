@@ -9,28 +9,34 @@
               integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" 
               crossorigin="anonymous">
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
         <link href="css/rsb.css" rel="stylesheet" type="text/css"/>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
-                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
-                crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <!--        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+                        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+                        crossorigin="anonymous"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" 
                 integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" 
-                crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" 
                 integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" 
-                crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-                
+
         <script>
-            $(document).ready(function() {
-                $("#btn_search").click(function() {
-                   if ($("#x_unumber").val() === "u1234567") {
-                       $("#div_researchername").html("<h1>Prof John Smith</h1>");
-                   }
+            $(document).ready(function () {
+                $("#btn_search").click(function () {
+                    if ($("#x_unumber").val() === "u1234567") {
+                        $("#div_researchername").html("<h1>Prof John Smith</h1>");
+                    }
                 });
                 $("#tbl_service_records").DataTable({
                     searching: false,
                     "lengthChange": false
+                });
+                $(".datepicker").datepicker({
+                    format: 'yyyy/dd/mm'
                 });
             });
         </script>
@@ -60,17 +66,30 @@
                     <div class="card bg-light">
                         <div class="card-header">Grant Awarded</div>
                         <div class="card-body">
-                            Grant range: <span id="grant_startdate">2017/01/01</span> to <span id="grant_firstenddate">[2019/12/31]</span>
-                            <br />
-                            <span id="grant_calcenddate">Calc. End Date: 2020/05/01</span> 
-                            &nbsp;<span id="grant_outerlimit">Outer Limit: 2010/12/31</span>
-                            <br />
-                            <span id="grant_daysawarded">Days: 660</span>
-                            <h5>Description</h5>
-                            <p id="grant_desc">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                            </p>
-
+                            <div class="row">
+                                <div class="col-sm-3 font-weight-bold">Grant range</div>
+                                <div class="col-sm-3"><span id="grant_startdate">2017/01/01</span></div>
+                                <div class="col-sm-3 font-weight-bold">to</div>
+                                <div class="col-sm-3"><span id="grant_firstenddate">[2019/12/31]</span></div>
+                            </div>
+                            <div class="row">
+                                <div class="col font-weight-bold">New End Dte</div>
+                                <div id="grant_calcenddate" class="col">2020/05/01</div>
+                                <div class="col font-weight-bold">Outer Limit</div>
+                                <div id="grant_outerlimit" class="col">2010/12/31</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 font-weight-bold">Days</div>
+                                <div id="grant_days_awarded" class="col-sm-3">660</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 font-weight-bold">Description</div>
+                                <div class="col-lg">
+                                    <p id="grant_desc">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -102,7 +121,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row"><br /></div>
             <div class="row">
                 <div id="div_service_record" class="col">
                     <div class="card bg-light">
@@ -170,15 +188,76 @@
                     <div class="card bg-light">
                         <div class="card-header">Calculator</div>
                         <div class="card-body">
-                            <p class="card-text">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label for="calc_start_date" class="col-sm-4 col-form-label">Start Date</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" id="calc_start_date" class="form-control datepicker" data-date-format="yyyy/mm/dd">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label for="calc_fte" class="col-sm-4 col-form-label">FTE</label>
+                                        <div class="col-sm-4">
+                                            <select id="calc_fte" class="form-control">
+                                                <option value="1.0">1.0</option>
+                                                <option value="0.9">0.9</option>
+                                                <option value="0.8">0.8</option>
+                                                <option value="0.7">0.7</option>
+                                                <option value="0.6">0.6</option>
+                                                <option value="0.5">0.5</option>
+                                                <option value="0.4">0.4</option>
+                                                <option value="0.3">0.3</option>
+                                                <option value="0.2">0.2</option>
+                                                <option value="0.1">0.1</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label for="calc_paid" class="col-sm-4 col-form-label">Absences: Paid</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="calc_paid" class="form-control" maxlength="6" size="6"/>
+                                        </div>
+                                        <label for="calc_unpaid" class="col-sm-2 col-form-label">Unpaid</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="calc_unpaid" class="form-control" maxlength="6" size="6"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4"></div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-info">Calculate</button>
+                                </div>
+                            </div>
+                            <div style="padding-top: 2px" class="row">
+                                <div class="col">
+                                <div class="card bg-light">
+                                    <div class="card-header bg-info">Projected Completion Date</div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-6"><span class="research_on_time">2019/11/20</span></div>
+                                            <div class="col-sm-6"><button type="button" class="btn btn-success" id="btn_email">Email calculation</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
 
     </body>
 </html>
