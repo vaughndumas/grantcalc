@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
     <head>
         <title>Grant Completion Calculator</title>
         <meta charset="UTF-8">
@@ -23,12 +23,18 @@
         crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
 
+        <script>
+            var vg_date_format = "YYYY-MM-DD";
+        </script>
         <script>
             $(document).ready(function () {
                 $("#btn_search").click(function () {
+                    get_grants_awarded($("#x_unumber").val());
+                    get_service_records($("#x_unumber").val());
                     if ($("#x_unumber").val() === "u1234567") {
-                        $("#div_researchername").html("<h1>Prof John Smith</h1>");
+                        $("#div_researchername").html("<h1>Prof John Smith</h1>");                  
                     }
                 });
                 $("#tbl_service_records").DataTable({
@@ -39,6 +45,50 @@
                     format: 'yyyy/dd/mm'
                 });
             });
+            
+            function get_grants_awarded(x_unumber) {
+                var v_start_date = "";
+                var v_end_date;
+                var v_outer_limit;
+                $.getJSON("/classes/get_grant.php?x_unumber="+x_unumber, function(x_data) {
+                    $.each(x_data, function(v_index, v_element) {
+                        v_textToDisplay = v_element;
+                        if (v_index === "start_date") {
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
+                          v_start_date = v_textToDisplay;
+                        }
+                        else if (v_index === "end_date") {
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
+                          v_end_date = v_textToDisplay;
+                        }
+                        else if (v_index === "outer_limit") {
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
+                          v_outer_limit = v_textToDisplay;
+                        }
+                        else if (v_index === "number_days") {
+                            v_number_days = v_element;
+                        }
+                        else if (v_index === "grant_description") {
+                            v_grant_desc = v_element;
+                        }
+                        console.log(v_index + " : " + v_textToDisplay); 
+                    });
+                    console.log("Setting values : " + v_start_date);
+                    $("#grant_startdate").text(v_start_date);
+                    $("#grant_firstenddate").text("[" + v_end_date + "]");
+                    $("#grant_outerlimit").text(v_outer_limit);
+                    $("#grant_days_awarded").text(v_number_days);
+                    $("#grant_desc").text(v_grant_desc);
+                    $("#grant_calcenddate").text("tbd");
+                });               
+            }
+            
+            function get_service_records(x_unumber) {
+                $("#tbl_service_records").DataTable().clear().draw();
+            }
         </script>
     </head>
     <body>
@@ -49,7 +99,7 @@
                     <div class="form-group row">
                         <label for="x_unumber" class="col-sm-4 col-form-label">University ID</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="x_unumber" placeholder="Enter Uni ID">
+                            <input type="text" class="form-control" id="x_unumber" value="u1234567" placeholder="Enter Uni ID">
                         </div>
                     </div>
                 </div>
@@ -98,22 +148,22 @@
                         <div class="card-header">Grant Usage</div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-3">Current FTE:</div>
+                                <div class="col-md-3 font-weight-bold">Current FTE</div>
                                 <div id="current_fte" class="col-md-3">1.0</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">Days used:</div>
+                                <div class="col-md-3 font-weight-bold">Days used</div>
                                 <div id="current_days_used" class="col-md-3">256</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">Days left:</div>
+                                <div class="col-md-3 font-weight-bold">Days left</div>
                                 <div id="current_days_left" class="col-md-3">404</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-5">Complete research by:</div>
+                                <div class="col-md-5 font-weight-bold">Complete research by</div>
                                 <div id="current_complete_by" class="col-md-3"><span class="research_on_time">2019/11/20</span></div>
                                 <div class="col-md-4"></div>
                             </div>
