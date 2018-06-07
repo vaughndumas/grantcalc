@@ -50,8 +50,7 @@
             });
             
             function rsb_format_date(x_date, x_separator) {
-                var v_momentDate = moment(x_date);
-                v_date2a = v_momentDate.toDate();
+                v_date2a = new Date(x_date);
                 v_year = v_date2a.getFullYear();
                 v_month = '' + (v_date2a.getMonth() + 1);
                 v_day = '' + v_date2a.getDate();
@@ -68,16 +67,20 @@
                     $.each(x_data, function(v_index, v_element) {
                         v_textToDisplay = v_element;
                         if (v_index === "start_date") {
-                          v_textToDisplay = rsb_format_date(v_element.date, '/');
+                            v_start_date
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
                           v_start_date = v_textToDisplay;
                         }
                         else if (v_index === "end_date") {
-                            v_textToDisplay = rsb_format_date(v_element.date, '/');
-                            v_end_date = v_textToDisplay;
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
+                          v_end_date = v_textToDisplay;
                         }
                         else if (v_index === "outer_limit") {
-                            v_textToDisplay = rsb_format_date(v_element.date, '/');
-                            v_outer_limit = v_textToDisplay;
+                          moment(v_element.date);
+                          v_textToDisplay = moment().format(vg_date_format);
+                          v_outer_limit = v_textToDisplay;
                         }
                         else if (v_index === "number_days") {
                             v_number_days = v_element;
@@ -101,36 +104,30 @@
                 $("#tbl_service_records").DataTable().clear().draw();
                 $.getJSON("/classes/get_service_records.php?x_unumber="+x_unumber, function(x_data) {
                     $.each(x_data, function(v_index, v_element) {
-//                        console.log(v_index + ":" + v_element);
                         v_svc_start_date = "";
                         v_svc_end_date = "";
-                        v_svc_type = "R";
-                        v_fte_ratio = 1.0;
-                        v_days_between = 0;
-                        $.each(v_element, function(v_index2, v_element2) {
+                        $.each(v_element, function(v_index2, v_element2){
                             switch (v_index2) {
-
                                 case "unumber"       : v_unumber = v_element2;
                                                        break;
-                                case "svc_start_date": v_svc_start_date = rsb_format_date(v_element2, '/');
+                                case "svc_start_date": v_svc_start_date = rsb_format_date(v_element2.date, '/');
                                                        break;
                                 case "svc_end_date"  : 
                                     if (v_element2 !== null && v_element2 !== '') {
-                                        v_svc_end_date = rsb_format_date(v_element2, '/');
+                                        v_svc_end_date = rsb_format_date(v_element2.date, '/');
                                     } else {
                                         v_svc_end_date = "";
                                     }
                                     break;
-                                case "days_between"  : v_days_between = v_element2;
                                 case "svc_type"      : v_svc_type = v_element2;
                                                        break;
                                 case "fte_ratio"     : v_fte_ratio = v_element2;
                                                        break;
                                 default:
                                     break;
-                            }; 
+                            };                           
                         });
-                        v_rec_to_add = [v_svc_start_date, v_svc_end_date, v_days_between, v_svc_type, v_fte_ratio];
+                        v_rec_to_add = [v_svc_start_date, v_svc_end_date, 0, v_svc_type, v_fte_ratio];
                         $("#tbl_service_records").DataTable().row.add(v_rec_to_add).draw();
                         
                     });
@@ -166,24 +163,25 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-3 font-weight-bold">Grant range</div>
-                                <div class="col-sm-3"><span id="grant_startdate"></span></div>
+                                <div class="col-sm-3"><span id="grant_startdate">2017/01/01</span></div>
                                 <div class="col-sm-3 font-weight-bold">to</div>
-                                <div class="col-sm-3"><span id="grant_firstenddate"></span></div>
+                                <div class="col-sm-3"><span id="grant_firstenddate">[2019/12/31]</span></div>
                             </div>
                             <div class="row">
                                 <div class="col font-weight-bold">New End Dte</div>
-                                <div id="grant_calcenddate" class="col"></div>
+                                <div id="grant_calcenddate" class="col">2020/05/01</div>
                                 <div class="col font-weight-bold">Outer Limit</div>
-                                <div id="grant_outerlimit" class="col"></div>
+                                <div id="grant_outerlimit" class="col">2010/12/31</div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-3 font-weight-bold">Days</div>
-                                <div id="grant_days_awarded" class="col-sm-3"></div>
+                                <div id="grant_days_awarded" class="col-sm-3">660</div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-3 font-weight-bold">Description</div>
                                 <div class="col-lg">
                                     <p id="grant_desc">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
                                     </p>
                                 </div>
                             </div>
@@ -196,22 +194,22 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Current FTE</div>
-                                <div id="current_fte" class="col-md-3"></div>
+                                <div id="current_fte" class="col-md-3">1.0</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Days used</div>
-                                <div id="current_days_used" class="col-md-3"></div>
+                                <div id="current_days_used" class="col-md-3">256</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Days left</div>
-                                <div id="current_days_left" class="col-md-3"></div>
+                                <div id="current_days_left" class="col-md-3">404</div>
                                 <div class="col-md-6"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-5 font-weight-bold">Complete research by</div>
-                                <div id="current_complete_by" class="col-md-3"><span class="research_on_time"></span></div>
+                                <div id="current_complete_by" class="col-md-3"><span class="research_on_time">2019/11/20</span></div>
                                 <div class="col-md-4"></div>
                             </div>
                         </div>
@@ -234,6 +232,48 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr>
+                                        <td>2017/01/01</td>
+                                        <td>2017/02/28</td>
+                                        <td>40</td>
+                                        <td>R</td>
+                                        <td>1.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/03/01</td>
+                                        <td>2017/06/01</td>
+                                        <td>80</td>
+                                        <td>R</td>
+                                        <td>0.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/06/02</td>
+                                        <td>2017/12/12</td>
+                                        <td>130</td>
+                                        <td>MT</td>
+                                        <td>0.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2017/12/13</td>
+                                        <td>2017/12/31</td>
+                                        <td>15</td>
+                                        <td>R</td>
+                                        <td>0.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2018/01/01</td>
+                                        <td>2018/04/30</td>
+                                        <td>80</td>
+                                        <td>R</td>
+                                        <td>0.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2018/05/01</td>
+                                        <td>&nbsp;</td>
+                                        <td>17</td>
+                                        <td>R</td>
+                                        <td>1.0</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
