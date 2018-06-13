@@ -27,6 +27,9 @@
 
         <script>
             var vg_date_format = "YYYY-MM-DD";
+            var vg_grant_end_date = 0;
+            vg_current_fte = 0.1;
+            vg_days_allowed = 0;
         </script>
         <script>
             $(document).ready(function () {
@@ -49,6 +52,11 @@
                 });
             });
             
+            function rsb_extend_date(x_date, x_days) {
+                var v_momentDate = moment(x_date);
+                v_momentDate.add(x_days, "days");
+                return v_momentDate.format();
+            }
             function rsb_format_date(x_date, x_separator) {
                 var v_momentDate = moment(x_date);
                 v_date2a = v_momentDate.toDate();
@@ -72,6 +80,7 @@
                           v_start_date = v_textToDisplay;
                         }
                         else if (v_index === "end_date") {
+                            vg_grant_end_date = v_element.date;
                             v_textToDisplay = rsb_format_date(v_element.date, '/');
                             v_end_date = v_textToDisplay;
                         }
@@ -81,6 +90,7 @@
                         }
                         else if (v_index === "number_days") {
                             v_number_days = v_element;
+                            vg_days_allowed = Math.trunc(v_number_days);
                         }
                         else if (v_index === "grant_description") {
                             v_grant_desc = v_element;
@@ -98,6 +108,8 @@
             }
             
             function get_service_records(x_unumber) {
+                v_total_days_to_add = 0;
+                v_days_used = 0;
                 $("#tbl_service_records").DataTable().clear().draw();
                 $.getJSON("/classes/get_service_records.php?x_unumber="+x_unumber, function(x_data) {
                     $.each(x_data, function(v_index, v_element) {
@@ -107,6 +119,9 @@
                         v_svc_type = "R";
                         v_fte_ratio = 1.0;
                         v_days_between = 0;
+                        v_tmp_days_to_add = 0;
+                        v_tmp_fte = 0.1;
+                        v_tmp_days_used = 0;
                         $.each(v_element, function(v_index2, v_element2) {
                             switch (v_index2) {
 
@@ -122,20 +137,37 @@
                                     }
                                     break;
                                 case "days_between"  : v_days_between = v_element2;
+                                                       v_days_used = v_days_used + parseFloat(v_days_between);
+                                                       break;
                                 case "svc_type"      : v_svc_type = v_element2;
                                                        break;
                                 case "fte_ratio"     : v_fte_ratio = v_element2;
+                                                       break;
+                                case "days_to_add"   : v_tmp_days_to_add = v_element2;
                                                        break;
                                 default:
                                     break;
                             }; 
                         });
+                        v_total_days_to_add += v_tmp_days_to_add;
+                        v_tmp_fte = v_fte_ratio;
                         v_rec_to_add = [v_svc_start_date, v_svc_end_date, v_days_between, v_svc_type, v_fte_ratio];
                         $("#tbl_service_records").DataTable().row.add(v_rec_to_add).draw();
-                        
                     });
+                    v_new_date = rsb_extend_date(vg_grant_end_date, v_total_days_to_add);
+                    vg_current_fte = v_tmp_fte;
+                    v_days_left = vg_days_allowed - (v_days_used + v_total_days_to_add);
+                    
+                    v_formatted_date = rsb_format_date(v_new_date, '/');
+                    $("#grant_calcenddate").text(v_formatted_date);
+                    $("#current_fte").text(vg_current_fte);
+                    $("#current_days_used").text(v_days_used.toFixed(2));
+                    $("#current_days_extended").text(v_total_days_to_add.toFixed(2));
+                    $("#current_days_left").text(v_days_left);
+                    $("#current_complete_by").text(v_formatted_date);
                 });
                 $("#tbl_service_records").DataTable().draw();
+
             }
         </script>
     </head>
@@ -202,7 +234,8 @@
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Days used</div>
                                 <div id="current_days_used" class="col-md-3"></div>
-                                <div class="col-md-6"></div>
+                                <div class="col-md-3 font-weight-bold">Days ext.</div>
+                                <div id="current_days_extended" class="col-md-3"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Days left</div>
@@ -277,11 +310,11 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group row">
-                                        <label for="calc_paid" class="col-sm-4 col-form-label">Absences: Paid</label>
+                                        <label for="calc_paid" class="col-sm-4 col-form-label">Absences (not ext)</label>
                                         <div class="col-sm-3">
                                             <input type="text" id="calc_paid" class="form-control" maxlength="6" size="6"/>
                                         </div>
-                                        <label for="calc_unpaid" class="col-sm-2 col-form-label">Unpaid</label>
+                                        <label for="calc_unpaid" class="col-sm-2 col-form-label">Ext</label>
                                         <div class="col-sm-3">
                                             <input type="text" id="calc_unpaid" class="form-control" maxlength="6" size="6"/>
                                         </div>
