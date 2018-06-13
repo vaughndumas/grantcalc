@@ -50,6 +50,9 @@
                 $(".datepicker").datepicker({
                     format: 'yyyy/dd/mm'
                 });
+                $("#btn_calculate").click(function () {
+                    whatif();
+                });
             });
             
             function rsb_extend_date(x_date, x_days) {
@@ -167,7 +170,41 @@
                     $("#current_complete_by").text(v_formatted_date);
                 });
                 $("#tbl_service_records").DataTable().draw();
-
+            }
+            
+            function whatif() {
+                v_wi_start_date = $("#calc_start_date").val();
+                v_wi_fte_ratio  = $("#calc_fte").val();
+                v_wi_days_left  = $("#current_days_left").text();
+                v_wi_extra_days = $("#calc_paid").val();
+                if (!v_wi_fte_ratio) {
+                    v_wi_fte_ratio = 1.0;
+                }
+                if (v_wi_start_date.length < 6) {
+                    alert("Please supply a start date");
+                    $("#calc_start_date").focus();
+                    return false;
+                }
+                if (v_wi_extra_days.length == 0) {
+                    v_wi_extra_days = 0;
+                }
+                if (Math.trunc(v_wi_extra_days) < 0) {
+                    alert("Absences may not contain a negative value");
+                    $("#calc_paid").focus().select();
+                    return false;
+                }
+                v_url = "/classes/whatif.php?x_start_date="+v_wi_start_date
+                       +"&x_fte_ratio="+v_wi_fte_ratio
+                       +"&x_days_to_extend="+v_wi_extra_days
+                       +"&x_days_left="+v_wi_days_left;
+                $.getJSON(v_url, function(x_data) {
+                   $.each(x_data, function(v_index, v_element) {
+                      if (v_index == "calc_end_date") {
+                          v_end_date = rsb_format_date(v_element.date, "/");
+                          $("#projected_end_date").text(v_end_date);
+                      } 
+                   });
+                });
             }
         </script>
     </head>
@@ -310,21 +347,24 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group row">
-                                        <label for="calc_paid" class="col-sm-4 col-form-label">Absences (not ext)</label>
+                                        <label for="calc_paid" class="col-sm-4 col-form-label">Absences</label>
                                         <div class="col-sm-3">
                                             <input type="text" id="calc_paid" class="form-control" maxlength="6" size="6"/>
                                         </div>
+                                        <div class="col-md-8"></div>
+                                        <!--
                                         <label for="calc_unpaid" class="col-sm-2 col-form-label">Ext</label>
                                         <div class="col-sm-3">
                                             <input type="text" id="calc_unpaid" class="form-control" maxlength="6" size="6"/>
                                         </div>
+                                        -->
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-4"></div>
                                 <div class="col">
-                                    <button type="button" class="btn btn-info">Calculate</button>
+                                    <button type="button" id="btn_calculate" class="btn btn-info">Calculate</button>
                                 </div>
                             </div>
                             <div style="padding-top: 2px" class="row">
@@ -333,7 +373,7 @@
                                     <div class="card-header bg-info">Projected Completion Date</div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-sm-6"><span class="research_on_time">2019/11/20</span></div>
+                                            <div class="col-sm-6"><span id="projected_end_date" class="research_on_time">2019/11/20</span></div>
                                             <div class="col-sm-6"><button type="button" class="btn btn-success" id="btn_email">Email calculation</button></div>
                                         </div>
                                     </div>
