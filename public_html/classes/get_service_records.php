@@ -39,7 +39,8 @@ while ($v_row = $db->fetchArray($v_rs)) {
                                                     $v_row['fte_ratio'], $v_row['svc_type'], 
                                                     $v_st_arr[$v_row['svc_type']]);
     //$v_diff = (date_diff($v_date1, $v_date2)->format("%a")) + 1;
-    $v_tmparr = ["svc_start_date" => $v_row['v_svc_start_date'],
+    $v_tmparr = [
+        "svc_start_date" => $v_row['v_svc_start_date'],
         "svc_end_date" => $v_row['v_svc_end_date'],
         "days_between" => $v_analysis["days_between_incl"],
         "svc_type" => $v_row['svc_type'],
@@ -47,7 +48,9 @@ while ($v_row = $db->fetchArray($v_rs)) {
         "fte_ratio" => $v_row['fte_ratio'],
         "extend_date" => $v_st_arr[$v_row['svc_type']]["extend_date_yn"],
         "new_end_date" => $v_analysis["new_end_date"],
-        "days_to_add" => $v_analysis["days_to_add"]
+        "days_to_add" => $v_analysis["days_to_add"],
+        "rounded_down" => $v_analysis["rounded_down"],
+        "rounded_up" => $v_analysis["rounded_up"]
     ];
     array_push($v_json_array, $v_tmparr);
 }

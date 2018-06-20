@@ -23,16 +23,30 @@ class calcutil {
         $v_total_days = date_diff($x_startdate, $x_enddate)->format('%a');
         $v_return = ["new_end_date"      => $x_enddate->format("Ymd"), 
                      "days_between_incl" => $v_total_days,
-                     "days_to_add"       => 0];
+                     "days_to_add"       => 0,
+                     "rounded_down"      => 0,
+                     "rounded_up"        => 0];
         
         if (!( ($x_fte === "1.00") || ($x_service_types["extend_date_yn"] === "N"))) {
+            $v_rounded_up = 0;
+            $v_rounded_down = 0;
+            $v_tmp_worked = round(floatval($x_fte) * $v_total_days);
             $v_days_worked = floatval($x_fte) * $v_total_days;
+            if (floatval($v_days_worked) >= $v_tmp_worked) {
+                $v_rounded_down = $v_days_worked - floatval($v_tmp_worked);
+                $v_rounded_up = 0;
+            } else {
+                $v_rounded_down = 0;
+                $v_rounded_up = floatval($v_tmp_worked) - $v_days_worked;
+            }
             $v_days_to_extend = $v_total_days - $v_days_worked;
             $v_tmpdate = $x_enddate;
             $v_new_enddate = date_add($v_tmpdate, \DateInterval::createFromDateString(intval($v_days_to_extend)." days"));
             $v_return = ["new_end_date"      => $v_new_enddate->format("Ymd"),
                          "days_between_incl" => $v_days_worked,
-                         "days_to_add"       => $v_days_to_extend];
+                         "days_to_add"       => $v_days_to_extend,
+                         "rounded_down"      => $v_rounded_down,
+                         "rounded_up"        => $v_rounded_up];
         }
         return $v_return;        
     }

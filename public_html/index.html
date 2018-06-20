@@ -35,7 +35,6 @@
             $(document).ready(function () {
                 $("#btn_search").click(function () {
                     get_grants_awarded($("#x_unumber").val());
-                    //get_service_records($("#x_unumber").val());
                     if ($("#x_unumber").val() === "u1234567") {
                         $("#div_researchername").html("<h1>Prof John Smith</h1>");                  
                     }
@@ -113,6 +112,8 @@
             function get_service_records(x_unumber) {
                 v_total_days_to_add = 0;
                 v_days_used = 0;
+                v_total_rounded_down = 0;
+                v_total_rounded_up = 0;
                 $("#tbl_service_records").DataTable().clear().draw();
                 $.getJSON("/classes/get_service_records.php?x_unumber="+x_unumber, function(x_data) {
                     $.each(x_data, function(v_index, v_element) {
@@ -125,6 +126,8 @@
                         v_tmp_days_to_add = 0;
                         v_tmp_fte = 0.1;
                         v_tmp_days_used = 0;
+                        v_rounded_down = 0;
+                        v_rounded_up = 0;
                         $.each(v_element, function(v_index2, v_element2) {
                             switch (v_index2) {
 
@@ -148,12 +151,18 @@
                                                        break;
                                 case "days_to_add"   : v_tmp_days_to_add = v_element2;
                                                        break;
+                                case "rounded_down"  : v_rounded_down = v_rounded_down + parseFloat(v_element2);
+                                                       break;
+                                case "rounded_up"    : v_rounded_up = v_rounded_up + parseFloat(v_element2);
+                                                       break;
                                 default:
                                     break;
                             }; 
                         });
                         v_total_days_to_add += v_tmp_days_to_add;
                         v_tmp_fte = v_fte_ratio;
+                        v_total_rounded_down += v_rounded_down;
+                        v_total_rounded_up += v_rounded_up;
                         v_rec_to_add = [v_svc_start_date, v_svc_end_date, v_days_between, v_svc_type, v_fte_ratio];
                         $("#tbl_service_records").DataTable().row.add(v_rec_to_add).draw();
                     });
@@ -164,10 +173,11 @@
                     v_formatted_date = rsb_format_date(v_new_date, '/');
                     $("#grant_calcenddate").text(v_formatted_date);
                     $("#current_fte").text(vg_current_fte);
-                    $("#current_days_used").text(v_days_used.toFixed(2));
-                    $("#current_days_extended").text(v_total_days_to_add.toFixed(2));
+                    $("#current_days_used").text(v_days_used.toFixed(3));
+                    $("#current_days_extended").text(v_total_days_to_add.toFixed(3));
                     $("#current_days_left").text(v_days_left);
                     $("#current_complete_by").text(v_formatted_date);
+                    $("#current_rounding").text((v_total_rounded_down - v_total_rounded_up).toFixed(3));
                 });
                 $("#tbl_service_records").DataTable().draw();
             }
@@ -277,7 +287,8 @@
                             <div class="row">
                                 <div class="col-md-3 font-weight-bold">Days left</div>
                                 <div id="current_days_left" class="col-md-3"></div>
-                                <div class="col-md-6"></div>
+                                <div class="col-md-3 font-weight-bold">Rounding</div>
+                                <div id="current_rounding" class="col-md-3"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-5 font-weight-bold">Complete research by</div>
@@ -298,7 +309,7 @@
                                     <tr>
                                         <th>From</th>
                                         <th>To</th>
-                                        <th>Days</th>
+                                        <th>Days used</th>
                                         <th>Type</th>
                                         <th>FTE</th>
                                     </tr>
@@ -328,18 +339,7 @@
                                     <div class="form-group row">
                                         <label for="calc_fte" class="col-sm-4 col-form-label">FTE</label>
                                         <div class="col-sm-4">
-                                            <select id="calc_fte" class="form-control">
-                                                <option value="1.0">1.0</option>
-                                                <option value="0.9">0.9</option>
-                                                <option value="0.8">0.8</option>
-                                                <option value="0.7">0.7</option>
-                                                <option value="0.6">0.6</option>
-                                                <option value="0.5">0.5</option>
-                                                <option value="0.4">0.4</option>
-                                                <option value="0.3">0.3</option>
-                                                <option value="0.2">0.2</option>
-                                                <option value="0.1">0.1</option>
-                                            </select>
+                                            <input type="number" id="calc_fte" class="form-control"/>
                                         </div>
                                     </div>
                                 </div>
@@ -373,7 +373,7 @@
                                     <div class="card-header bg-info">Projected Completion Date</div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-sm-6"><span id="projected_end_date" class="research_on_time">2019/11/20</span></div>
+                                            <div class="col-sm-6"><span id="projected_end_date" class="research_on_time"></span></div>
                                             <div class="col-sm-6"><button type="button" class="btn btn-success" id="btn_email">Email calculation</button></div>
                                         </div>
                                     </div>
