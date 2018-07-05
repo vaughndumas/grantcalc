@@ -21,6 +21,7 @@ class calcutil {
                                           $x_svc_type, $x_service_types) {
  
         $v_total_days = date_diff($x_startdate, $x_enddate)->format('%a');
+        $v_total_days += 1;
         $v_return = ["new_end_date"      => $x_enddate->format("Ymd"), 
                      "days_between_incl" => $v_total_days,
                      "days_to_add"       => 0,
